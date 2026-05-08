@@ -1,0 +1,258 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from google.colab import files
+
+plt.rcParams['figure.figsize'] = (12, 8)
+plt.rcParams['font.size'] = 10
+sns.set_style("whitegrid")
+
+# Завдання 1: Завантаження датасетів
+print("=" * 60)
+print("Завдання 1: Завантаження даних")
+print("=" * 60)
+
+# Завантаження першого датасету
+uploaded = files.upload()
+df1 = pd.read_csv('Museum_Visitors.csv')
+print("\nПерший датасет (Museum_Visitors):")
+print(f"Розмір: {df1.shape}")
+print(f"\nПерші 5 рядків:\n{df1.head()}")
+
+# Завдання 2: Завантаження другого датасету
+uploaded = files.upload()
+df2 = pd.read_csv('Museum_Visitors (2).csv')
+print("\n\nДругий датасет (Museum_Visitors (2)):")
+print(f"Розмір: {df2.shape}")
+print(f"\nПерші 5 рядків:\n{df2.head()}")
+
+# Завдання 3: Попередній аналіз даних
+print("\n" + "=" * 60)
+print("Завдання 3: Попередній аналіз даних")
+print("=" * 60)
+
+print("\n--- Датасет 1 ---")
+print(f"Розмір датасету: {df1.shape[0]} рядків × {df1.shape[1]} стовпців")
+print(f"Типи даних:\n{df1.dtypes}")
+print(f"\nКількість пропусків:\n{df1.isnull().sum()}")
+
+print("\n--- Датасет 2 ---")
+print(f"Розмір датасету: {df2.shape[0]} рядків × {df2.shape[1]} стовпців")
+print(f"Типи даних:\n{df2.dtypes}")
+print(f"\nКількість пропусків:\n{df2.isnull().sum()}")
+
+# Завдання 4: Перевірка наявності дублікатів
+print("\n" + "=" * 60)
+print("Завдання 4: Перевірка дублікатів")
+print("=" * 60)
+
+duplicates_df1 = df1.duplicated().sum()
+duplicates_df2 = df2.duplicated().sum()
+
+print(f"\nДатасет 1: {duplicates_df1} дублікатів")
+print(f"Датасет 2: {duplicates_df2} дублікатів")
+
+if duplicates_df1 > 0:
+    df1 = df1.drop_duplicates()
+    print(f"Дублікати видалено з датасету 1. Новий розмір: {df1.shape}")
+
+if duplicates_df2 > 0:
+    df2 = df2.drop_duplicates()
+    print(f"Дублікати видалено з датасету 2. Новий розмір: {df2.shape}")
+
+# Завдання 5: Інформація про роки в датасетах
+print("\n" + "=" * 60)
+print("Завдання 5: Інформація про роки")
+print("=" * 60)
+
+# Визначення стовпців з роками (зазвичай це числові стовпці)
+year_columns_df1 = [col for col in df1.columns if col.isdigit()]
+year_columns_df2 = [col for col in df2.columns if col.isdigit()]
+
+print(f"\nДатасет 1 містить інформацію за роки: {year_columns_df1}")
+print(f"Датасет 2 містить інформацію за роки: {year_columns_df2}")
+
+# Завдання 6: Зміна назв стовпців
+print("\n" + "=" * 60)
+print("Завдання 6: Зміна назв стовпців")
+print("=" * 60)
+
+# Приклад назв стовпців до зміни
+print(f"\nСтовпці датасету 1 до зміни: {list(df1.columns)}")
+print(f"Стовпці датасету 2 до зміни: {list(df2.columns)}")
+
+# Зміна назв (якщо потрібно)
+# Наприклад, заміна пробілів на підкреслення
+df1.columns = df1.columns.str.replace(' ', '_').str.lower()
+df2.columns = df2.columns.str.replace(' ', '_').str.lower()
+
+print(f"\nСтовпці датасету 1 після зміни: {list(df1.columns)}")
+print(f"\nСтовпці датасету 2 після зміни: {list(df2.columns)}")
+
+# Визначення музеїв
+museums = {
+    'avila_adobe': 'Avila Adobe',
+    'firehouse_museum': 'Firehouse Museum',
+    'chinese_american_museum': 'Chinese American Museum',
+    'america_tropical_interpretive_center': 'America Tropical Interpretive Center'
+}
+
+# Завдання 7: Обчислення середньої кількості відвідувачів
+print("\n" + "=" * 60)
+print("Завдання 7: Середня кількість відвідувачів")
+print("=" * 60)
+
+# Оновлення year_columns після зміни назв
+year_columns_df1 = [col for col in df1.columns if col.isdigit()]
+year_columns_df2 = [col for col in df2.columns if col.isdigit()]
+
+for museum_col, museum_name in museums.items():
+    if museum_col in df1.columns:
+        avg_visitors = df1[museum_col].mean()
+        print(f"\nСередня кількість відвідувачів {museum_name}: {avg_visitors:.2f}")
+
+# Завдання 8: Мінімальна та максимальна кількість відвідувачів
+print("\n" + "=" * 60)
+print("Завдання 8: Мінімальна та максимальна кількість відвідувачів для кожного музею за 2018 рік")
+print("=" * 60)
+
+if '2018' in df1.columns:
+    print(f"\nСтатистика за 2018 рік:")
+    for museum_col, museum_name in museums.items():
+        if museum_col in df1.columns:
+            museum_data_2018 = df1[df1[museum_col].notna()]
+            if not museum_data_2018.empty and '2018' in museum_data_2018.columns:
+                min_val = museum_data_2018['2018'].min()
+                max_val = museum_data_2018['2018'].max()
+                print(f"{museum_name}: мін = {min_val}, макс = {max_val}")
+
+# Завдання 9: Місяці з найбільшою та найменшою загальною кількістю відвідувачів
+print("\n" + "=" * 60)
+print("Завдання 9: Місяці з найбільшою та найменшою кількістю відвідувачів (2015-2018)")
+print("=" * 60)
+
+if 'month' in df1.columns:
+    years_to_analyze = ['2015', '2016', '2017', '2018']
+    available_years = [y for y in years_to_analyze if y in df1.columns]
+
+    if available_years:
+        df1['total_visitors'] = df1[available_years].sum(axis=1)
+        monthly_stats = df1.groupby('month')['total_visitors'].sum().sort_values()
+
+        print(f"\nМісяць з найменшою кількістю: {monthly_stats.index[0]} ({monthly_stats.iloc[0]:.0f} відвідувачів)")
+        print(f"Місяць з найбільшою кількістю: {monthly_stats.index[-1]} ({monthly_stats.iloc[-1]:.0f} відвідувачів)")
+
+# Завдання 10: Кількість відвідувачів Avila Adobe у літні і зимові місяці 2018
+print("\n" + "=" * 60)
+print("Завдання 10: Avila Adobe - літо vs зима 2018")
+print("=" * 60)
+
+if 'month' in df1.columns and 'avila_adobe' in df1.columns:
+    summer_months = ['June', 'July', 'August']
+    winter_months = ['December', 'January', 'February']
+
+    summer_visitors = df1[df1['month'].isin(summer_months)]['avila_adobe'].sum()
+    winter_visitors = df1[df1['month'].isin(winter_months)]['avila_adobe'].sum()
+
+    print(f"\nЛітні місяці (червень, липень, серпень): {summer_visitors:.0f} відвідувачів")
+    print(f"Зимові місяці (грудень, січень, лютий): {winter_visitors:.0f} відвідувачів")
+
+# Завдання 11: Кореляція між кількістю відвідувачів у кожному з музеїв та датами у 2016
+print("\n" + "=" * 60)
+print("Завдання 11: Кореляція між музеями (2016)")
+print("=" * 60)
+
+museum_columns = [col for col in museums.keys() if col in df1.columns]
+if len(museum_columns) >= 2:
+    correlation_matrix = df1[museum_columns].corr()
+    print(f"\nМатриця кореляції:\n{correlation_matrix}")
+
+print("ВІЗУАЛІЗАЦІЯ ДАНИХ")
+
+# Завдання 12: Лінійний графік (відвідуваність Avila Adobe з часом)
+plt.figure(figsize=(14, 6))
+if 'avila_adobe' in df1.columns and 'month' in df1.columns:
+    monthly_avila = df1.groupby('month')['avila_adobe'].sum()
+    plt.plot(monthly_avila.index, monthly_avila.values, marker='o', linewidth=2, markersize=8)
+    plt.title('Відвідуваність Avila Adobe за місяцями', fontsize=14, fontweight='bold')
+    plt.xlabel('Місяць', fontsize=12)
+    plt.ylabel('Кількість відвідувачів', fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig('/mnt/user-data/outputs/line_chart_avila.png', dpi=300, bbox_inches='tight')
+    print("\n✓ Лінійний графік збережено")
+plt.close()
+
+# Завдання 13: Boxplot (розподіл відвідувачів Chinese American Museum по роках)
+plt.figure(figsize=(12, 6))
+if 'chinese_american_museum' in df1.columns:
+    year_data = []
+    year_labels = []
+    for year in ['2015', '2016', '2017', '2018']:
+        if year in df1.columns:
+            year_data.append(df1[df1['chinese_american_museum'].notna()][year].dropna())
+            year_labels.append(year)
+
+    if year_data:
+        plt.boxplot(year_data, labels=year_labels)
+        plt.title('Розподіл відвідувачів Chinese American Museum по роках', fontsize=14, fontweight='bold')
+        plt.xlabel('Рік', fontsize=12)
+        plt.ylabel('Кількість відвідувачів', fontsize=12)
+        plt.grid(True, alpha=0.3, axis='y')
+        plt.tight_layout()
+        plt.savefig('/mnt/user-data/outputs/boxplot_chinese_museum.png', dpi=300, bbox_inches='tight')
+        print("✓ Boxplot збережено")
+plt.close()
+
+# Завдання 14: Histogram (розподіл кількості відвідувачів Gateway to Nature Center)
+plt.figure(figsize=(12, 6))
+if 'gateway_to_nature_center' in df2.columns:
+    df2['gateway_to_nature_center'].hist(bins=30, edgecolor='black', alpha=0.7)
+    plt.title('Гістограма розподілу відвідувачів Gateway to Nature Center', fontsize=14, fontweight='bold')
+    plt.xlabel('Кількість відвідувачів', fontsize=12)
+    plt.ylabel('Частота', fontsize=12)
+    plt.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    plt.savefig('/mnt/user-data/outputs/histogram_gateway.png', dpi=300, bbox_inches='tight')
+    print("✓ Гістограма збережено")
+plt.close()
+
+# Завдання 15: Barplot (середня кількість відвідувачів по музеях за весь рік)
+plt.figure(figsize=(14, 7))
+museum_columns = [col for col in museums.keys() if col in df1.columns]
+if museum_columns:
+    avg_visitors_by_museum = df1[museum_columns].mean()
+    colors = sns.color_palette("husl", len(avg_visitors_by_museum))
+
+    bars = plt.bar(range(len(avg_visitors_by_museum)), avg_visitors_by_museum.values, color=colors, edgecolor='black', linewidth=1.5)
+    plt.title('Середня кількість відвідувачів по музеях за рік', fontsize=14, fontweight='bold')
+    plt.xlabel('Музей', fontsize=12)
+    plt.ylabel('Середня кількість відвідувачів', fontsize=12)
+    plt.xticks(range(len(avg_visitors_by_museum)),
+               [museums.get(col, col) for col in avg_visitors_by_museum.index],
+               rotation=45, ha='right')
+
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.0f}',
+                ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+    plt.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    plt.savefig('/mnt/user-data/outputs/barplot_museums.png', dpi=300, bbox_inches='tight')
+    print("✓ Barplot збережено")
+plt.close()
+
+print("\n" + "=" * 60)
+print("ЛАБОРАТОРНА РОБОТА ЗАВЕРШЕНА!")
+print("=" * 60)
+print("\nУсі графіки збережено у папці /mnt/user-data/outputs/")
+print("Файли:")
+print("  - line_chart_avila.png")
+print("  - boxplot_chinese_museum.png")
+print("  - histogram_gateway.png")
+print("  - barplot_museums.png")
