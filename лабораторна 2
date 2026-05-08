@@ -1,0 +1,91 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+uploaded = files.upload()
+
+# Завдання 1. Прочитати CSV файл
+
+df = pd.read_csv("Global YouTube Statistics.csv" ,encoding="latin1")
+print("Датасет успішно завантажено\n")
+
+# Завдання 2. Вивести перші 5 рядків
+
+print("Перші 5 рядків датасету:")
+print(df.head(), "\n")
+
+# Завдання 3. Вивести розміри датасету
+
+print("Розмір датасету (рядки, стовпці):")
+print(df.shape, "\n")
+
+# Завдання 4. Перевірка пропусків
+
+print("Кількість пропусків у кожному стовпці:")
+print(df.isna().sum(), "\n")
+
+# Замінюємо порожні значення на NaN
+df = df.replace(" ", np.nan)
+
+# Пробуємо перетворити числові колонки
+for col in df.columns:
+    df[col] = pd.to_numeric(df[col], errors="ignore")
+
+# Завдання 5. Замінити пропуски на середні значення
+
+df = df.fillna(df.mean(numeric_only=True))
+
+# Змінюємо тип на float де можливо
+df = df.astype(float, errors="ignore")
+
+print("Пропуски замінені на середні значення\n")
+
+# Завдання 6. Повторна перевірка пропусків
+
+print("Кількість пропусків після обробки:")
+print(df.isna().sum(), "\n")
+
+# Завдання 7. Кількість унікальних країн
+
+unique_countries = df["Country"].nunique()
+print("Кількість унікальних країн:", unique_countries, "\n")
+
+# Завдання 8. Діаграма розподілу переглядів
+
+plt.figure()
+df["video views"].plot(kind="hist", bins=30)
+
+plt.title("Розподіл переглядів YouTube")
+plt.xlabel("Кількість переглядів")
+plt.ylabel("Частота")
+
+plt.show()
+
+# Завдання 9. Максимальні, мінімальні та середні перегляди
+
+max_views = df["video views"].max()
+min_views = df["video views"].min()
+mean_views = df["video views"].mean()
+
+print("Максимальна кількість переглядів:", max_views)
+print("Мінімальна кількість переглядів:", min_views)
+print("Середня кількість переглядів:", mean_views, "\n")
+
+# Завдання 10. Країна з найбільшою кількістю завантажених відео
+
+country_max_uploads = df.groupby("Country")["uploads"].sum().idxmax()
+
+print("Країна з найбільшою кількістю завантажених відео:")
+print(country_max_uploads, "\n")
+
+# Завдання 11. Відео з найбільшою та найменшою кількістю uploads
+
+max_upload_video = df.loc[df["uploads"].idxmax(), "title"]
+min_upload_video = df.loc[df["uploads"].idxmin(), "title"]
+
+print("Відео з найбільшою кількістю uploads:")
+print(max_upload_video)
+
+print("\nВідео з найменшою кількістю uploads:")
+print(min_upload_video)
+     
